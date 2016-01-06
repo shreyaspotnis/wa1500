@@ -4,7 +4,12 @@ import serial
 # init RS232 port COM1, 2400 baud, 8 data bits, no
 # parity, 1 stop bit
 
-wa1500 = serial.Serial(port='COM1', baudrate=2400,
+# wa1500 = serial.Serial(port='COM3', baudrate=1200,
+#                        parity=serial.PARITY_NONE,
+#                        stopbits=serial.STOPBITS_TWO,
+#                        bytesize=serial.EIGHTBITS)
+
+wa1500 = serial.Serial(port='COM5', baudrate=9600,
                        parity=serial.PARITY_NONE,
                        stopbits=serial.STOPBITS_TWO,
                        bytesize=serial.EIGHTBITS)

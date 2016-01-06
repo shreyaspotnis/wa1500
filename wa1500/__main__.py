@@ -1,9 +1,7 @@
 import time
 import serial
 import random
-
 import zmq
-import sys
 
 publish_port = "5556"
 
@@ -50,12 +48,17 @@ class WA1500_dummy:
 
 wavemeter = WA1500_dummy('COM5')
 
-for i in range(20):
-    topic = 1
-    freq = wavemeter.read_frequency()
-    print "%d %f" % (topic, freq)
-    pub_socket.send("%d %f" % (topic, freq))
-    time.sleep(0.1)
-
-print wavemeter.close()
+try:
+    for i in range(20):
+        topic = 1
+        freq = wavemeter.read_frequency()
+        print "%d %f" % (topic, freq)
+        pub_socket.send("%d %f" % (topic, freq))
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    print wavemeter.close()
+    pub_socket.close()
+else:
+    print wavemeter.close()
+    pub_socket.close()
 

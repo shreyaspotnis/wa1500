@@ -1,32 +1,61 @@
 import time
 import serial
+import random
 
-# init RS232 port COM1, 2400 baud, 8 data bits, no
-# parity, 1 stop bit
+import zmq
+import sys
 
-# wa1500 = serial.Serial(port='COM3', baudrate=1200,
-#                        parity=serial.PARITY_NONE,
-#                        stopbits=serial.STOPBITS_TWO,
-#                        bytesize=serial.EIGHTBITS)
+publish_port = "5556"
 
-wa1500 = serial.Serial(port='COM5', baudrate=9600,
-                       parity=serial.PARITY_NONE,
-                       stopbits=serial.STOPBITS_TWO,
-                       bytesize=serial.EIGHTBITS)
+zmq_context = zmq.Context()
+pub_socket = zmq_context.socket(zmq.PUB)
+pub_socket.bind("tcp://*:%s" % publish_port)
 
 
-print 'Is port open?', wa1500.isOpen()
+class WA1500:
 
-input = '@Q'
-wa1500.write(input + '\r\n')
-out = ''
-# let's wait one second before reading output
-# (let's give device time to answer)
-time.sleep(1)
-while wa1500.inWaiting() > 0:
-    out += wa1500.read(1)
+    def __init__(self, address, baudrate=1200, timeout=2):
 
-if out != '':
-    print ">>" + out
+        self.timeout = timeout
+        self.device = serial.Serial(address, baudrate=baudrate,
+                                    timeout=self.timeout)
+        self.device.flush()
 
-wa1500.close()
+    def read_frequency(self):
+        self.device.write("@Q\r\n")
+        self.device.flushInput()
+        s = self.device.readline()
+        self.device.flushOutput()
+        frequency = float(s.split(',')[0])
+        return frequency
+
+    def close(self):
+        self.device.close()
+        if not self.device.isOpen():
+            return "WA-1500 link closed"
+        else:
+            return "WA-1500 close error"
+
+
+class WA1500_dummy:
+
+    def __init__(self, address, baudrate=1200, timeout=2):
+        pass
+
+    def read_frequency(self):
+        return 375000.00 + random.gauss(0., 0.1)
+
+    def close(self):
+        pass
+
+wavemeter = WA1500_dummy('COM5')
+
+for i in range(20):
+    topic = 1
+    freq = wavemeter.read_frequency()
+    print "%d %f" % (topic, freq)
+    pub_socket.send("%d %f" % (topic, freq))
+    time.sleep(0.1)
+
+print wavemeter.close()
+

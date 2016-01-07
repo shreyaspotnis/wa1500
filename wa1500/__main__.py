@@ -2,6 +2,7 @@ import time
 import serial
 import random
 import zmq
+import datetime
 
 publish_port = "5556"
 
@@ -49,11 +50,13 @@ class WA1500_dummy:
 wavemeter = WA1500_dummy('COM5')
 
 try:
-    for i in range(20):
-        topic = 1
+    while True:
+        topic = 'wa1500'  # This will be useful when there are multiple streams
+                          # to watch
         freq = wavemeter.read_frequency()
-        print "%d %f" % (topic, freq)
-        pub_socket.send("%d %f" % (topic, freq))
+        dt = str(datetime.datetime.now())
+        print "%s %s %f" % (topic, dt, freq)
+        pub_socket.send("%s %s %f" % (topic, dt,freq))
         time.sleep(0.1)
 except KeyboardInterrupt:
     print wavemeter.close()

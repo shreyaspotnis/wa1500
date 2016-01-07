@@ -23,9 +23,13 @@ class WA1500:
     def read_frequency(self):
         self.device.write("@Q\r\n")
         self.device.flushInput()
-        s = self.device.readline()
-        self.device.flushOutput()
-        frequency = float(s.split(',')[0])
+        try:
+            s = self.device.readline()
+            self.device.flushOutput()
+            frequency = float(s.split(',')[0])
+        except:
+            # write better error handling here
+            frequency = -1.0
         return frequency
 
     def close(self):
@@ -47,7 +51,7 @@ class WA1500_dummy:
     def close(self):
         pass
 
-wavemeter = WA1500_dummy('COM5')
+wavemeter = WA1500('COM5')
 
 try:
     while True:

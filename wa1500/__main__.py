@@ -25,8 +25,11 @@ class WA1500:
         self.device.flushInput()
         try:
             s = self.device.readline()
+            print('recvd: %s' % s)
             self.device.flushOutput()
             frequency = float(s.split(',')[0])
+        except KeyboardInterrupt:
+            raise
         except:
             # write better error handling here
             frequency = -1.0

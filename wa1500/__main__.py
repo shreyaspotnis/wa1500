@@ -27,7 +27,11 @@ class WA1500:
             s = self.device.readline()
             print('recvd: %s' % s)
             self.device.flushOutput()
-            frequency = float(s.split(',')[0])
+            if 'LO SIG' in s:
+                print('Low signal')
+                frequency = -1.0
+            else:
+                frequency = float(s.split(',')[0])
         except KeyboardInterrupt:
             raise
         except:

@@ -23,12 +23,18 @@ class WA1500:
     def read_frequency(self):
         self.device.write("@Q\r\n")
         self.device.flushInput()
+        err_msg = 'ok'
         try:
             s = self.device.readline()
             print('recvd: %s' % s)
             self.device.flushOutput()
             if 'LO SIG' in s:
-                print('Low signal')
+                err_msg = 'low signal'
+                print(err_msg)
+                frequency = -1.0
+            elif 'HI SIG' in s:
+                err_msg = 'high signal'
+                print(err_msg)
                 frequency = -1.0
             else:
                 frequency = float(s.split(',')[0])
@@ -37,7 +43,8 @@ class WA1500:
         except:
             # write better error handling here
             frequency = -1.0
-        return frequency
+            err_msg = 'unknown error'
+        return frequency, err_msg
 
     def close(self):
         self.device.close()
@@ -58,16 +65,17 @@ class WA1500_dummy:
     def close(self):
         pass
 
-wavemeter = WA1500('COM5')
+wavemeter = WA1500('COM8')
 
 try:
     while True:
         topic = 'wa1500'  # This will be useful when there are multiple streams
                           # to watch
-        freq = wavemeter.read_frequency()
+        freq, err_msg = wavemeter.read_frequency()
         dt = str(datetime.datetime.now())
-        print "%s %s %f" % (topic, dt, freq)
-        pub_socket.send("%s %s %f" % (topic, dt,freq))
+        send_string = "%s %s %f %s" % (topic, dt, freq, err_msg)
+        print(send_string)
+        pub_socket.send(send_string)
         time.sleep(0.1)
 except KeyboardInterrupt:
     print wavemeter.close()

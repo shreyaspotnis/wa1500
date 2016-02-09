@@ -36,6 +36,10 @@ class WA1500:
                 err_msg = 'high signal'
                 print(err_msg)
                 frequency = -1.0
+            elif '~' in s:
+                err_msg = 'possibly multimode'
+                print(err_msg)
+                frequency = float(s.split(',')[0][1:])
             else:
                 frequency = float(s.split(',')[0])
         except KeyboardInterrupt:

@@ -69,10 +69,13 @@ class WA1500_dummy:
     def close(self):
         pass
 
-wavemeter = WA1500('COM8')
-
-try:
-    while True:
+done = False
+wavemeter_define = False
+while not done:
+  try:
+     wavemeter = WA1500('/dev/ttyUSB0')
+     wavemeter_define = True
+     while True:
         topic = 'wa1500'  # This will be useful when there are multiple streams
                           # to watch
         freq, err_msg = wavemeter.read_frequency()
@@ -81,10 +84,14 @@ try:
         print(send_string)
         pub_socket.send(send_string)
         time.sleep(0.1)
-except KeyboardInterrupt:
+ except KeyboardInterrupt:
     print wavemeter.close()
     pub_socket.close()
-else:
-    print wavemeter.close()
-    pub_socket.close()
-
+    done = True
+ except serial.serialutil.SerialException as e:
+     print "Serial Exception: ", e
+     if wavemeter_define:
+         wavemeter.close()
+         wavemeter_define = False
+         
+     time.sleep(1.0)

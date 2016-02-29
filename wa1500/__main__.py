@@ -8,7 +8,7 @@ import sys
 
 publish_port = "5556"
 
-if len(sys.argv) == 2:
+if len(sys.argv) >= 2:
     serial_device_path = sys.argv[1]
 else:
     serial_device_path = '/dev/ttyUSB0'

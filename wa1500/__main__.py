@@ -3,8 +3,21 @@ import serial
 import random
 import zmq
 import datetime
+import sys
+
 
 publish_port = "5556"
+
+if len(sys.argv) == 2:
+    serial_device_path = sys.argv[1]
+else:
+    serial_device_path = '/dev/ttyUSB0'
+
+if len(sys.argv) == 3:
+    topic = sys.argv[2]
+else:
+    topic = 'wa1500'  # This will be useful when there are multiple streams
+                      # to watch
 
 zmq_context = zmq.Context()
 pub_socket = zmq_context.socket(zmq.PUB)
@@ -73,11 +86,9 @@ done = False
 wavemeter_define = False
 while not done:
     try:
-        wavemeter = WA1500('/dev/ttyUSB0')
+        wavemeter = WA1500(serial_device_path)
         wavemeter_define = True
         while True:
-            topic = 'wa1500'  # This will be useful when there are multiple streams
-                              # to watch
             freq, err_msg = wavemeter.read_frequency()
             dt = str(datetime.datetime.now())
             send_string = "%s %s %f %s" % (topic, dt, freq, err_msg)

@@ -94,7 +94,7 @@ while not done:
             send_string = "%s %s %f %s" % (topic, dt, freq, err_msg)
             print(send_string)
             pub_socket.send(send_string)
-            time.sleep(0.1)
+            time.sleep(0.5)
     except KeyboardInterrupt:
         print wavemeter.close()
         pub_socket.close()

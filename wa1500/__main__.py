@@ -11,7 +11,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Reads and publishes the wa1500'
                                  'wavemeter an a zeromq socket.\n'
                                  'Example usage: wa1500.py --serialport COM5'
-                                 ' --publishport 557 --topic wa1500')
+                                 ' --publishport 5557 --topic wa1500')
 parser.add_argument("-s", "--serialport", type=str,
                     help='Serial port to use to communicate with the'
                          'wavemeter. e.g /dev/ttyUSB0 for linux, '

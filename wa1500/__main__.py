@@ -6,9 +6,9 @@ import datetime
 import sys
 
 
-publish_port = "5556"
+publish_port = "5557"
 
-if len(sys.argv) == 2:
+if len(sys.argv) >= 2:
     serial_device_path = sys.argv[1]
 else:
     serial_device_path = '/dev/ttyUSB0'
@@ -94,7 +94,7 @@ while not done:
             send_string = "%s %s %f %s" % (topic, dt, freq, err_msg)
             print(send_string)
             pub_socket.send(send_string)
-            time.sleep(0.1)
+            time.sleep(0.5)
     except KeyboardInterrupt:
         print wavemeter.close()
         pub_socket.close()

@@ -10,7 +10,7 @@ Provides functions to communicate with the WA-1500 wavemeter via serial.
 ## Usage
 ```
 cd /path/to/wa1500
-python wa1500 --serialport COM5'' --publishport 5557 --topic wa1500
+python wa1500 --serialport COM5 --publishport 5557 --topic wa1500
 ```
 
 Replace COM5 with the serial port that the device is connected to. For linux

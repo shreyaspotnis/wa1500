@@ -6,7 +6,7 @@ import datetime
 import sys
 
 
-publish_port = "5556"
+publish_port = "5557"
 
 if len(sys.argv) >= 2:
     serial_device_path = sys.argv[1]

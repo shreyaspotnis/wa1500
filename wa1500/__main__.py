@@ -32,6 +32,8 @@ publish_port = args.publishport
 topic = args.topic
 serial_device_path = args.serialport
 
+print('Broadcasting on port {0} with topic {1}'.format(publish_port, topic))
+
 zmq_context = zmq.Context()
 pub_socket = zmq_context.socket(zmq.PUB)
 pub_socket.bind("tcp://*:%s" % publish_port)
@@ -90,31 +92,35 @@ class WA1500_dummy:
         pass
 
     def read_frequency(self):
-        return 375000.00 + random.gauss(0., 0.1)
+        return 375000.00 + random.gauss(0., 0.1), 'ok'
 
     def close(self):
         pass
 
 done = False
-wavemeter_define = False
+wavemeter_defined = False
 while not done:
     try:
         wavemeter = WA1500(serial_device_path)
-        wavemeter_define = True
+        wavemeter_defined = True
         while True:
             freq, err_msg = wavemeter.read_frequency()
-            dt = str(datetime.datetime.now())
-            send_string = "%s %s %f %s" % (topic, dt, freq, err_msg)
+            timestamp = time.time()
+            data_dict = {'timestamp': timestamp,
+                         'freq': freq,
+                         'err_msg': err_msg}
+            send_string = "%s %f %s" % (topic, timestamp, repr(data_dict))
             print(send_string)
             pub_socket.send(send_string)
             time.sleep(0.5)
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as e:
+        print "KeyboardInterrupt: exiting"
         print wavemeter.close()
         pub_socket.close()
         done = True
     except serial.serialutil.SerialException as e:
-        print "Serial Exception: ", e
-        if wavemeter_define:
+        print "SerialException: ", e
+        if wavemeter_defined:
             wavemeter.close()
-            wavemeter_define = False
+            wavemeter_defined = False
         time.sleep(1.0)

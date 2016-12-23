@@ -1,23 +1,36 @@
+"""Reads and publishes the wa1500 wavemeter an a zeromq socket."""
+
 import time
 import serial
 import random
 import zmq
 import datetime
 import sys
+import argparse
+
+parser = argparse.ArgumentParser(description='Reads and publishes the wa1500'
+                                 'wavemeter an a zeromq socket.\n'
+                                 'Example usage: wa1500.py --serialport COM5'
+                                 ' --publishport 557 --topic wa1500')
+parser.add_argument("-s", "--serialport", type=str,
+                    help='Serial port to use to communicate with the'
+                         'wavemeter. e.g /dev/ttyUSB0 for linux, '
+                         'COM5 for windows',
+                    default='COM5')
+parser.add_argument("-p", "--publishport", type=int,
+                    help='zeromq port to use to broadcast the wavemeter'
+                         'reading.',
+                    default=5557)
+parser.add_argument("-t", "--topic", type=str,
+                    help='topic to use when broadcasting. e.g wa1500-lab1',
+                    default='wa1500')
+
+args = parser.parse_args()
 
 
-publish_port = "5557"
-
-if len(sys.argv) >= 2:
-    serial_device_path = sys.argv[1]
-else:
-    serial_device_path = '/dev/ttyUSB0'
-
-if len(sys.argv) == 3:
-    topic = sys.argv[2]
-else:
-    topic = 'wa1500'  # This will be useful when there are multiple streams
-                      # to watch
+publish_port = args.publishport
+topic = args.topic
+serial_device_path = args.serialport
 
 zmq_context = zmq.Context()
 pub_socket = zmq_context.socket(zmq.PUB)

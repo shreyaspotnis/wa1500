@@ -38,6 +38,7 @@ class zmq_pub_dict:
         zmq_context = zmq.Context()
         self.topic = topic
         self.pub_socket = zmq_context.socket(zmq.PUB)
+
         self.pub_socket.bind("tcp://*:%s" % port)
         print('Broadcasting on port {0} with topic {1}'.format(port,
                                                                topic))

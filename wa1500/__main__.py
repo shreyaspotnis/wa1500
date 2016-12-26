@@ -139,6 +139,9 @@ while not done:
         if wavemeter_defined:
             wavemeter.close()
             wavemeter_defined = False
+        data_dict = {'freq': -1.0,
+                     'err_msg': 'SerialException'}
+        publisher.send(data_dict)
         time.sleep(1.0)
 
 publisher.close()
